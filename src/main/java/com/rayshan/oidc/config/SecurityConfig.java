@@ -82,14 +82,15 @@ public class SecurityConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/**", "/error", "/actuator/**", "/h2-console/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/error", "/actuator/**", "/h2-console/**", "/logout").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/api/auth/**", "/h2-console/**")
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+                .oidcLogout(Customizer.withDefaults());
 
         return http.build();
     }
@@ -198,6 +199,7 @@ public class SecurityConfig {
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
                 .issuer("http://localhost:9111")
+                .oidcLogoutEndpoint("/oauth2/logout")
                 .build();
     }
 }
